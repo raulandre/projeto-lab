@@ -2,6 +2,7 @@
 
 int main(void)
 {
-	printf("Ola mundo!\n");
+	printf("Ola imundo!\n");
+	printf("Seguinte meu PARCEIRO...\n");
 	return 0;
 }

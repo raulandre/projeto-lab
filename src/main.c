@@ -3,34 +3,37 @@
 
 #include "client.h"
 #include "list.h"
+#include "queue.h"
 
 int count = 0;
 
 int main()
 {
 
-    list l; init(&l);
+    list l;
+    init(&l);
+    queue q;
+    initq(&q);
 
-	client c;
+    client c;
+    int r;
 
-    for(int i = 0; i < 3; i++)
-    {
-        puts("Nome: ");
-        scanf("%s", c.name); getchar();
-        puts("CPF: ");
-        scanf("%s", c.cpf); getchar();
-        puts("Saldo: ");
-        scanf("%lf", &c.balance); getchar();
+    puts("Nome: ");
+    r = scanf("%s", c.name);
+    getchar();
+    puts("CPF: ");
+    r = scanf("%s", c.cpf);
+    getchar();
+    puts("Saldo: ");
+    r = scanf("%lf", &c.balance);
+    getchar();
 
-        c.id = ++count;
+    c.id = ++count;
 
-        push_back(&l, c);
-    }
+    push_back(&l, c);
 
-    for(int i = 0; i < l.size; i++)
-    {
-        print_client(get(l, i)->c);
-    }
+    addq(&q, c);
+    print_client(q.end->c);
 
-	return 0;
+    return 0;
 }

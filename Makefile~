@@ -1,8 +1,8 @@
 CC = gcc
 FLAGS = -Wall -O3 -Iinclude/
 
-all: bin main.o client.o list.o queue.o mainmenu.o 
-	$(CC) $(FLAGS) obj/main.o obj/client.o obj/list.o obj/queue.o obj/mainmenu.o  -lncurses -o bin/a.out
+all: bin main.o client.o list.o queue.o
+	$(CC) $(FLAGS) obj/main.o obj/client.o obj/list.o obj/queue.o -lncurses -o bin/a.out
 
 main.o: src/main.c
 	$(CC) $(FLAGS) -c src/main.c -o obj/main.o
@@ -15,9 +15,6 @@ list.o: src/list.c include/list.h
 
 queue.o: src/queue.c include/queue.h
 	$(CC) $(FLAGS) -c src/queue.c -o obj/queue.o
-
-mainmenu.o: src/mainmenu.c include/mainmenu.h
-	$(CC) $(FLAGS) -c src/mainmenu.c -o obj/mainmenu.o
 
 bin:
 	mkdir bin obj

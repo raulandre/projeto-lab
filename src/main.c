@@ -19,7 +19,7 @@ int main()
 
 	write_client(filename, &cl);
 
-    printMenu();
+	printMenu();
 
 	return 0;
 }

@@ -5,7 +5,7 @@
 #include "client.h"
 #include <stdbool.h>
 
-#define CLIENT_FORMAT "%d,%s,%s,%.2f"
+#define CLIENT_FORMAT "%d,%s,%s,%.2f\n"
 
 bool file_exists(const char*);
 int count_lines(const char*);

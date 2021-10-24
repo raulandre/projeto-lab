@@ -1,5 +1,5 @@
 CC = gcc
-FLAGS = -Wall -O3 -Iinclude/
+FLAGS = -Werror -O2 -Iinclude/
 
 all: bin main.o client.o list.o queue.o mainmenu.o serial.o
 	$(CC) $(FLAGS) obj/main.o obj/client.o obj/list.o obj/queue.o obj/mainmenu.o obj/serial.o -lncurses -o bin/a.out

@@ -15,6 +15,10 @@ int main()
 
 	load_data(&l, filename);
 
+	client cl = { .id = 1, .name = "Main", .cpf = "12345678912", .balance = 0.0f };
+
+	write_client(filename, &cl);
+
     printMenu();
 
 	return 0;

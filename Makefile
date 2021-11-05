@@ -1,5 +1,5 @@
-CC = gcc
-FLAGS = -Werror -O2 -Iinclude/
+CC = clang
+FLAGS = -Werror -Wall -O2 -I./include
 
 all: bin main.o client.o list.o queue.o mainmenu.o serial.o
 	$(CC) $(FLAGS) obj/main.o obj/client.o obj/list.o obj/queue.o obj/mainmenu.o obj/serial.o -lncurses -o bin/a.out
@@ -26,4 +26,6 @@ bin:
 	mkdir bin obj
 
 clean:
-	rm -r bin/ obj/
+	@echo "Limpando projeto ..."
+	@rm -rf bin obj
+	@find . -name "*.dat" -exec rm -f {} \;

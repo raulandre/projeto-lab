@@ -1,10 +1,11 @@
+
 #include <ncurses.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "mainmenu.h"
 
 
-void destroy_win(WINDOW *local_win){	
+void destroy_win(WINDOW *local_win){
       wclear(local_win);
       wborder (local_win, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ');
       wrefresh(local_win);
@@ -15,8 +16,8 @@ WINDOW *create_newwin(int height, int width, int starty, int startx){
   WINDOW *local_win;
 
   local_win = newwin(height, width, starty, startx);
-  box(local_win, 0 , 0);		 
-  wrefresh(local_win);		
+  box(local_win, 0 , 0);
+  wrefresh(local_win);
 
   return local_win;
 }
@@ -33,7 +34,7 @@ void rowMenu(int yMax, int xMax){
 	char rowChoices [4] [40] = {"Mostrar a Fila", "Adicionar","Chamar o Proximo", "Voltar"};
 	int rowChoice, highlight = 0, rowOption;
 
-	
+
 	while(1) {	
 		for(int i = 0; i < 4; i++){
 			if(i == highlight)
@@ -86,9 +87,8 @@ void clientsMenu(int yMax, int xMax){
 	//esolha
 	char clientsChoices [3] [22] = {"Criar um Cliente", "Listar Um Cliente", "Voltar"};
 	int clientChoice, highlight = 0, clientOption;
-                                                                                            
-	
-	while(1) {	
+
+	while(1) {
 		for(int i = 0; i < 3; i++){
 			if(i == highlight)
 				wattron(clientwin,A_REVERSE);
@@ -97,10 +97,10 @@ void clientsMenu(int yMax, int xMax){
 			wrefresh(clientwin);
 		}
 		clientChoice = wgetch(clientwin);
-                                                                                            
+
 		switch(clientChoice){
 			case KEY_UP:
-				highlight--;	
+				highlight--;
 				if(highlight == -1)
 					highlight = 2;
 				break;
@@ -119,7 +119,6 @@ void clientsMenu(int yMax, int xMax){
 					case 3:
 						mainMenu();
 						break;
-                                                                                            
 				}
 		}
 	}
@@ -128,42 +127,40 @@ void clientsMenu(int yMax, int xMax){
 }
 
 void mainMenu(){
-	
 	// tamanho da tela
-	int yMax, xMax;
+	int yMax, xMax, aux = 0;
 	getmaxyx(stdscr, yMax, xMax);
-	
+
 	//criando box
 	WINDOW * win;
-	
+
 	//WINDOW * win = newwin(10,50, (yMax/2)-5,(xMax/2)-25);
-	win = create_newwin(8,40, (yMax/2)-4,(xMax/2)-20);
+	win = create_newwin(8, 40, (yMax / 2) - 4,(xMax / 2) - 20);
 	refresh();
-	box(win,0,0);
+	box(win,0, 0);
 	wrefresh(win);
 
 	//interacao com o teclado
 	keypad(win, true);
 
 	//menu
-	char choices[3] [9] ={"Clientes", "Fila","Sair"};
+	char choices[3][9] = {"Clientes", "Fila", "Sair"};
 	int choice, highlight = 0, option;
 
-	
-	while(1) {	
-		for(int i = 0; i < 3; i++){
-			if(i == highlight)
-				wattron(win,A_REVERSE);
+	while(!aux) {
+		for (int i = 0; i < 3; i++){
+			if (i == highlight)
+				wattron(win, A_REVERSE);
 			mvwprintw(win, i+2, 1,"\t%s", choices[i]);
 			wattroff(win,A_REVERSE);
 			wrefresh(win);
 		}
 		choice = wgetch(win);
 
-		switch(choice){
+		switch(choice) {
 			case KEY_UP:
-				highlight--;	
-				if(highlight == -1)
+				highlight--;
+				if (highlight == -1)
 					highlight = 2;
 				break;
 			case KEY_DOWN:
@@ -172,7 +169,7 @@ void mainMenu(){
 					highlight = 0;
 				break;
 			case 10:
-				option= highlight +1;
+				option = highlight + 1;
 				switch(option){
 					case 1:
 						clientsMenu(yMax, xMax);
@@ -181,24 +178,28 @@ void mainMenu(){
 						rowMenu(yMax, xMax);
 						break;
 					case 3:
+					default:
 						refresh();
-						endwin();
-						exit(0);
+						aux = 1;
+						// exit(0);
 						break;
 
 				}
+				break;
+			// default:
+				// break;
 		}
+
 	}
+	endwin();
+	// destroy_win(win);
+	return;
 }
-
-
 
 void printMenu(){
 	// inicializando ncurses
 	initscr();
 	noecho();
 	cbreak();
-	
 	mainMenu();
-
 }

@@ -1,9 +1,6 @@
-
-#include <ncurses.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "mainmenu.h"
-
 
 void destroy_win(WINDOW *local_win){
       wclear(local_win);

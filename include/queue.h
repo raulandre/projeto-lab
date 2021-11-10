@@ -6,23 +6,20 @@
 
 #include "client.h"
 
-struct nodeq
+struct no
 {
     client c;
-    struct nodeq *next;
+    struct no *prox;
 };
 
 typedef struct
 {
-    struct nodeq *begin;
-    struct nodeq *end;
-    size_t size;
-} queue;
+    struct no *inicio;
+    struct no *fim;
+} fila;
 
-void initq(queue*);
-int addq(queue*, client);
-int shiftq(queue*);
-int isEmptyq(queue);
-struct nodeq* getq(queue, size_t);
+int  insere(fila *q, client);
+int  retira(fila *q, client *);
+void mostra(fila q);
 
 #endif // QUEUE_H

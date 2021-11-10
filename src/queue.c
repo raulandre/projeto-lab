@@ -1,62 +1,62 @@
 #include "queue.h"
+#include "client.h"
 
-void initq(queue *q)
+int  insere(fila *q, client d)
 {
-    q->begin = NULL;
-    q->end = NULL;
-    q->size = 0;
-}
 
-int addq(queue *q, client c)
-{
-    struct nodeq *aux = (struct nodeq*)malloc(sizeof(struct nodeq));
-    if(aux == NULL) return 0;
+    struct no *aux;
 
-    aux->c = c;
-    aux->next = NULL;
+    aux = (struct no*) malloc(sizeof(struct no));
 
-    if(q->begin == NULL)
+    if (aux == NULL)
+        return 0;
+
+    aux->c = d;
+
+    aux->prox = NULL; 
+
+    if (q->inicio == NULL)
     {
-        q->begin = aux;
-        q->end = aux;
-        q->size++;
+        q->inicio = aux;
+        q->fim = aux;
         return 1;
     }
 
-    q->end->next = aux;
-    q->end = aux;
-    q->size++;
+    q->fim->prox = aux;
+    q->fim = aux;
     return 1;
 }
 
-int shiftq(queue *q)
+int  retira(fila *q, client *d)
 {
-    if(q->size == 0) return 0;
+    struct no *aux;
+    if (q->inicio == NULL)
+        return 0;
 
-    struct nodeq *aux = q->begin;
-    q->begin = q->begin->next;
+    aux = q->inicio;
+
+    *d = q->inicio->c;
+
+    q->inicio = q->inicio->prox;
     free(aux);
-    q->size--;
 
-    if(q->begin == NULL) q->end = NULL;
-
+    if (q->inicio == NULL)
+        q->fim = NULL;
     return 1;
 }
 
-int isEmptyq(queue q)
+void mostra(fila q)
 {
-    return q.size == 0;
-}
-
-struct nodeq* getq(queue q, size_t index)
-{
-    if(index < 0 || index >= q.size) return NULL;
-
-    struct nodeq *aux = q.begin;
-    for(int i = 0; i < index; i++)
+    struct no *aux;
+    if (q.inicio == NULL)
+        printf("\nFila vazia...\n\n");
+    else
     {
-        aux = aux->next;
+        aux = q.inicio;
+        while (aux != NULL)
+        {
+            print_client(aux->c);
+            aux = aux->prox;
+        }
     }
-
-    return aux;
-};
+}

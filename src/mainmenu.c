@@ -2,11 +2,26 @@
 #include <stdlib.h>
 #include "mainmenu.h"
 
+typedef struct
+{
+	int id;
+	char name[30];
+	char cpf[12];
+	float balance;
+} client;
+
+//client createClientsAnswers[100];
+
+client c;
+
+int qtdclients = 0;
+
+
 void destroy_win(WINDOW *local_win){
       wclear(local_win);
       wborder (local_win, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ');
       wrefresh(local_win);
-      delwin(local_win);
+     delwin(local_win);
 }
 
 WINDOW *create_newwin(int height, int width, int starty, int startx){
@@ -29,10 +44,10 @@ void rowMenu(int yMax, int xMax){
 
 	keypad(rowwin, true);
 	char rowChoices [4] [40] = {"Mostrar a Fila", "Adicionar","Chamar o Proximo", "Voltar"};
-	int rowChoice, highlight = 0, rowOption;
+	int rowChoice, highlight = 0, rowOption, aux = 0;
 
 
-	while(1) {	
+	while(!aux) {	
 		for(int i = 0; i < 4; i++){
 			if(i == highlight)
 				wattron(rowwin,A_REVERSE);
@@ -63,13 +78,95 @@ void rowMenu(int yMax, int xMax){
 					case 3: 
 						break;
 					case 4:
+						refresh();
+						destroy_win(rowwin);
+						aux = 1;
 						mainMenu();
 						break;
+					default:
+					refresh();
+					destroy_win(rowwin);
+					aux = 1;
+					mainMenu();
 
 				}
+			default:
+				break;
 		}
 	}
+	
+	return;
+}
 
+
+void createClientsMenu(int yMax, int xMax){
+	WINDOW * createclientwin;
+
+	createclientwin = create_newwin(8,40, (yMax/2)-4, (xMax/2)-20);
+	refresh();
+	box(createclientwin,0,0);
+	wrefresh(createclientwin);
+
+	keypad(createclientwin, true);
+	char createClientsChoices [3] [22] = {"Nome: ", "CPF: ", "Saldo: "};
+	
+	for(int i = 0; i < 3; i++){
+		
+		mvwprintw(createclientwin, 1+i, 1,"%s", createClientsChoices[i]);
+		wattroff(createclientwin,A_REVERSE);
+		wrefresh(createclientwin);
+	} 
+		c.id = qtdclients;
+	echo();
+		wmove(createclientwin,1,6);
+			wgetstr(createclientwin,c.name);	
+
+		wmove(createclientwin,2,5);
+     wgetstr(createclientwin,c.cpf);
+
+		//wmove(createclientwin,3,7);
+		mvwscanw(createclientwin,3, 7, "%f", c.balance);
+
+	getchar();	
+		refresh();
+		qtdclients+=1;
+		destroy_win(createclientwin);
+		clientsMenu(yMax, xMax);
+
+}
+
+void viewClientsMenu(int yMax, int xMax){
+	WINDOW * viewclientwin;
+	
+	getmaxyx(stdscr, yMax, xMax);
+	viewclientwin = create_newwin(8,40, (yMax/2)-4, (xMax/2)-20);
+	refresh();
+	box(viewclientwin,0,0);
+	wrefresh(viewclientwin);
+
+	keypad(viewclientwin, true);
+	mvwprintw(viewclientwin,1, 1, " Nome\t\tCPF\t\tSaldo");
+	wattroff(viewclientwin,A_REVERSE);
+	wrefresh(viewclientwin);
+	refresh();	
+	int starty = 1;   
+     	int startx = 1;
+
+	if(qtdclients > 0) {       
+       		for(int i=0;i<qtdclients;i++){
+			wattroff(viewclientwin, A_REVERSE);
+			wmove(viewclientwin, starty+(i+1), startx);
+    			wprintw(viewclientwin,"%s\t%s\t%f",c.name,
+			c.cpf, c.balance);
+			wattroff(viewclientwin,A_REVERSE);
+    			wrefresh(viewclientwin);
+   		}
+	}
+	else{
+		mvwprintw(viewclientwin, 1,1,"nao tem cliente");
+	}
+	getch();
+	clientsMenu(yMax, xMax);
 }
 
 void clientsMenu(int yMax, int xMax){
@@ -81,11 +178,11 @@ void clientsMenu(int yMax, int xMax){
 	wrefresh(clientwin);
 
 	keypad(clientwin, true);
-	//esolha
+	//escolha
 	char clientsChoices [3] [22] = {"Criar um Cliente", "Listar Um Cliente", "Voltar"};
-	int clientChoice, highlight = 0, clientOption;
+	int clientChoice, highlight = 0, clientOption, aux = 0;
 
-	while(1) {
+	while(!aux) {
 		for(int i = 0; i < 3; i++){
 			if(i == highlight)
 				wattron(clientwin,A_REVERSE);
@@ -110,28 +207,45 @@ void clientsMenu(int yMax, int xMax){
 				clientOption = highlight+1;
 				switch(clientOption){
 					case 1:
+						refresh();
+						destroy_win(clientwin);
+						createClientsMenu(yMax, xMax);
 						break;
 					case 2:
+						refresh();
+						destroy_win(clientwin);
+						viewClientsMenu(yMax, xMax);
 						break;
 					case 3:
+						refresh();
+						destroy_win(clientwin);
+						aux = 1;
+						mainMenu();
+						break;
+					default:
+						refresh();
+						destroy_win(clientwin);
+						aux = 1;
 						mainMenu();
 						break;
 				}
+			default:
+
+				break;
 		}
 	}
-
 
 }
 
 void mainMenu(){
 	// tamanho da tela
-	int yMax, xMax, aux = 0;
+	int aux = 0;
+	int yMax, xMax;
 	getmaxyx(stdscr, yMax, xMax);
 
 	//criando box
 	WINDOW * win;
-
-	//WINDOW * win = newwin(10,50, (yMax/2)-5,(xMax/2)-25);
+ 
 	win = create_newwin(8, 40, (yMax / 2) - 4,(xMax / 2) - 20);
 	refresh();
 	box(win,0, 0);
@@ -169,28 +283,31 @@ void mainMenu(){
 				option = highlight + 1;
 				switch(option){
 					case 1:
+						refresh();
+						destroy_win(win);
 						clientsMenu(yMax, xMax);
 						break;
 					case 2:
+						refresh();
+						destroy_win(win);
 						rowMenu(yMax, xMax);
 						break;
 					case 3:
+						refresh();
+						aux = 1;
+						break;
 					default:
 						refresh();
 						aux = 1;
-						// exit(0);
 						break;
 
 				}
+			default:
 				break;
-			// default:
-				// break;
 		}
 
 	}
-	endwin();
-	// destroy_win(win);
-	return;
+	
 }
 
 void printMenu(){
@@ -199,4 +316,5 @@ void printMenu(){
 	noecho();
 	cbreak();
 	mainMenu();
+	endwin();
 }

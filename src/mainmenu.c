@@ -5,12 +5,11 @@
 typedef struct
 {
 	int id;
-	char name[30];
+	char name[31];
 	char cpf[12];
 	float balance;
 } client;
 
-//client createClientsAnswers[100];
 
 client c;
 
@@ -61,7 +60,7 @@ void rowMenu(int yMax, int xMax){
 			case KEY_UP:
 				highlight--;	
 				if(highlight == -1)
-					highlight = 2;
+					highlight = 3;
 				break;
 			case KEY_DOWN:
 				highlight++;
@@ -95,7 +94,6 @@ void rowMenu(int yMax, int xMax){
 		}
 	}
 	
-	return;
 }
 
 
@@ -122,10 +120,9 @@ void createClientsMenu(int yMax, int xMax){
 			wgetstr(createclientwin,c.name);	
 
 		wmove(createclientwin,2,5);
-     wgetstr(createclientwin,c.cpf);
+     wgetnstr(createclientwin, c.cpf, 11);
 
-		//wmove(createclientwin,3,7);
-		mvwscanw(createclientwin,3, 7, "%f", c.balance);
+		mvwscanw(createclientwin,3, 7, "%f", &c.balance);
 
 	getchar();	
 		refresh();
@@ -148,7 +145,7 @@ void viewClientsMenu(int yMax, int xMax){
 	mvwprintw(viewclientwin,1, 1, " Nome\t\tCPF\t\tSaldo");
 	wattroff(viewclientwin,A_REVERSE);
 	wrefresh(viewclientwin);
-	refresh();	
+	refresh();
 	int starty = 1;   
      	int startx = 1;
 
@@ -156,7 +153,7 @@ void viewClientsMenu(int yMax, int xMax){
        		for(int i=0;i<qtdclients;i++){
 			wattroff(viewclientwin, A_REVERSE);
 			wmove(viewclientwin, starty+(i+1), startx);
-    			wprintw(viewclientwin,"%s\t%s\t%f",c.name,
+    			wprintw(viewclientwin,"%s\t%s\t%.2f",c.name,
 			c.cpf, c.balance);
 			wattroff(viewclientwin,A_REVERSE);
     			wrefresh(viewclientwin);
@@ -166,6 +163,7 @@ void viewClientsMenu(int yMax, int xMax){
 		mvwprintw(viewclientwin, 1,1,"nao tem cliente");
 	}
 	getch();
+	destroy_win(viewclientwin);
 	clientsMenu(yMax, xMax);
 }
 
@@ -178,7 +176,6 @@ void clientsMenu(int yMax, int xMax){
 	wrefresh(clientwin);
 
 	keypad(clientwin, true);
-	//escolha
 	char clientsChoices [3] [22] = {"Criar um Cliente", "Listar Um Cliente", "Voltar"};
 	int clientChoice, highlight = 0, clientOption, aux = 0;
 
@@ -219,14 +216,11 @@ void clientsMenu(int yMax, int xMax){
 					case 3:
 						refresh();
 						destroy_win(clientwin);
-						aux = 1;
 						mainMenu();
+						aux = 1;
 						break;
 					default:
 						refresh();
-						destroy_win(clientwin);
-						aux = 1;
-						mainMenu();
 						break;
 				}
 			default:
@@ -238,12 +232,10 @@ void clientsMenu(int yMax, int xMax){
 }
 
 void mainMenu(){
-	// tamanho da tela
 	int aux = 0;
 	int yMax, xMax;
 	getmaxyx(stdscr, yMax, xMax);
 
-	//criando box
 	WINDOW * win;
  
 	win = create_newwin(8, 40, (yMax / 2) - 4,(xMax / 2) - 20);
@@ -251,10 +243,8 @@ void mainMenu(){
 	box(win,0, 0);
 	wrefresh(win);
 
-	//interacao com o teclado
 	keypad(win, true);
 
-	//menu
 	char choices[3][9] = {"Clientes", "Fila", "Sair"};
 	int choice, highlight = 0, option;
 
@@ -295,6 +285,8 @@ void mainMenu(){
 					case 3:
 						refresh();
 						aux = 1;
+						destroy_win(win);
+						endwin();
 						break;
 					default:
 						refresh();
@@ -311,10 +303,8 @@ void mainMenu(){
 }
 
 void printMenu(){
-	// inicializando ncurses
 	initscr();
 	noecho();
 	cbreak();
 	mainMenu();
-	endwin();
 }

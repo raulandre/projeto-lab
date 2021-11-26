@@ -138,7 +138,6 @@ void write_client(const char *filename, client *c)
 void write_client_r(const char *filename, client *c, list *l)
 {
     FILE *fp = fopen(filename, "a+");
-
     if(fp == NULL) return;
     fprintf(fp, CLIENT_FORMAT, c->id, c->name, c->cpf, c->balance);
     push_back(l, *c);

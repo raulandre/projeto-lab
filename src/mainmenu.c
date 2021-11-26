@@ -1,20 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "mainmenu.h"
+#include "client.h"
+#include "serial.h"
 
-typedef struct
-{
-	int id;
-	char name[31];
-	char cpf[12];
-	float balance;
-} client;
-
+#define filename "clients.dat"
 
 client c;
-
-int qtdclients = 0;
-
 
 void destroy_win(WINDOW *local_win){
       wclear(local_win);
@@ -33,7 +25,7 @@ WINDOW *create_newwin(int height, int width, int starty, int startx){
   return local_win;
 }
 
-void rowMenu(int yMax, int xMax){
+void rowMenu(list* l, int yMax, int xMax){
 	WINDOW * rowwin;
 
 	rowwin = create_newwin(8,40, (yMax/2)-4, (xMax/2)-20);
@@ -80,13 +72,13 @@ void rowMenu(int yMax, int xMax){
 						refresh();
 						destroy_win(rowwin);
 						aux = 1;
-						mainMenu();
+						mainMenu(l);
 						break;
 					default:
 					refresh();
 					destroy_win(rowwin);
 					aux = 1;
-					mainMenu();
+					mainMenu(l);
 
 				}
 			default:
@@ -97,7 +89,7 @@ void rowMenu(int yMax, int xMax){
 }
 
 
-void createClientsMenu(int yMax, int xMax){
+void createClientsMenu(list* l, int yMax, int xMax){
 	WINDOW * createclientwin;
 
 	createclientwin = create_newwin(8,40, (yMax/2)-4, (xMax/2)-20);
@@ -114,10 +106,10 @@ void createClientsMenu(int yMax, int xMax){
 		wattroff(createclientwin,A_REVERSE);
 		wrefresh(createclientwin);
 	} 
-		c.id = qtdclients;
+
 	echo();
 		wmove(createclientwin,1,6);
-			wgetstr(createclientwin,c.name);	
+			wgetnstr(createclientwin,c.name, 30);	
 
 		wmove(createclientwin,2,5);
      wgetnstr(createclientwin, c.cpf, 11);
@@ -126,13 +118,16 @@ void createClientsMenu(int yMax, int xMax){
 
 	getchar();	
 		refresh();
-		qtdclients+=1;
+
+		c.id = l->size + 1;
+		write_client_r(filename, &c, l);
+
 		destroy_win(createclientwin);
-		clientsMenu(yMax, xMax);
+		clientsMenu(l, yMax, xMax);
 
 }
 
-void viewClientsMenu(int yMax, int xMax){
+void viewClientsMenu(list* l, int yMax, int xMax){
 	WINDOW * viewclientwin;
 	
 	getmaxyx(stdscr, yMax, xMax);
@@ -149,25 +144,32 @@ void viewClientsMenu(int yMax, int xMax){
 	int starty = 1;   
      	int startx = 1;
 
-	if(qtdclients > 0) {       
-       		for(int i=0;i<qtdclients;i++){
-			wattroff(viewclientwin, A_REVERSE);
-			wmove(viewclientwin, starty+(i+1), startx);
-    			wprintw(viewclientwin,"%s\t%s\t%.2f",c.name,
-			c.cpf, c.balance);
-			wattroff(viewclientwin,A_REVERSE);
-    			wrefresh(viewclientwin);
-   		}
+	if(l->size > 0) {       
+		for(int i = 0; i < l->size; i++)
+		{
+			struct node *n = get(*l, i);
+			if(n != NULL)
+			{
+				client cl = n->c;
+				wattroff(viewclientwin, A_REVERSE);
+				wmove(viewclientwin, starty+(i+1), startx);
+					wprintw(viewclientwin,"%s\t%s\t%.2f",cl.name,
+				cl.cpf, cl.balance);
+				wattroff(viewclientwin,A_REVERSE);
+					wrefresh(viewclientwin);
+			}
+			n = n->next;
+		}
 	}
 	else{
 		mvwprintw(viewclientwin, 1,1,"nao tem cliente");
 	}
 	getch();
 	destroy_win(viewclientwin);
-	clientsMenu(yMax, xMax);
+	clientsMenu(l, yMax, xMax);
 }
 
-void clientsMenu(int yMax, int xMax){
+void clientsMenu(list* l, int yMax, int xMax){
 	WINDOW * clientwin;
 
 	clientwin = create_newwin(8,40, (yMax/2)-4, (xMax/2)-20);
@@ -176,7 +178,7 @@ void clientsMenu(int yMax, int xMax){
 	wrefresh(clientwin);
 
 	keypad(clientwin, true);
-	char clientsChoices [3] [22] = {"Criar um Cliente", "Listar Um Cliente", "Voltar"};
+	char clientsChoices [3] [22] = {"Criar um Cliente", "Listar Clientes", "Voltar"};
 	int clientChoice, highlight = 0, clientOption, aux = 0;
 
 	while(!aux) {
@@ -206,17 +208,17 @@ void clientsMenu(int yMax, int xMax){
 					case 1:
 						refresh();
 						destroy_win(clientwin);
-						createClientsMenu(yMax, xMax);
+						createClientsMenu(l, yMax, xMax);
 						break;
 					case 2:
 						refresh();
 						destroy_win(clientwin);
-						viewClientsMenu(yMax, xMax);
+						viewClientsMenu(l, yMax, xMax);
 						break;
 					case 3:
 						refresh();
 						destroy_win(clientwin);
-						mainMenu();
+						mainMenu(l);
 						aux = 1;
 						break;
 					default:
@@ -231,7 +233,7 @@ void clientsMenu(int yMax, int xMax){
 
 }
 
-void mainMenu(){
+void mainMenu(list* l){
 	int aux = 0;
 	int yMax, xMax;
 	getmaxyx(stdscr, yMax, xMax);
@@ -275,12 +277,12 @@ void mainMenu(){
 					case 1:
 						refresh();
 						destroy_win(win);
-						clientsMenu(yMax, xMax);
+						clientsMenu(l, yMax, xMax);
 						break;
 					case 2:
 						refresh();
 						destroy_win(win);
-						rowMenu(yMax, xMax);
+						rowMenu(l, yMax, xMax);
 						break;
 					case 3:
 						refresh();
@@ -302,9 +304,9 @@ void mainMenu(){
 	
 }
 
-void printMenu(){
+void printMenu(list* l){
 	initscr();
 	noecho();
 	cbreak();
-	mainMenu();
+	mainMenu(l);
 }

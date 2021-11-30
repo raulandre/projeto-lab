@@ -13,7 +13,7 @@ void destroy_win(WINDOW *);
 WINDOW *crete_newwin(int, int, int, int);
 void rowMenu(list*, int, int);
 void clientsMenu(list*, int, int);
-void mainMenu(list*);
+void mainMenu(list*, int, int);
 void printMenu(list*);
 
 #endif 

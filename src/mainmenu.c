@@ -8,305 +8,322 @@
 
 client c;
 
-void destroy_win(WINDOW *local_win){
-      wclear(local_win);
-      wborder (local_win, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ');
-      wrefresh(local_win);
-     delwin(local_win);
+void destroy_win(WINDOW *local_win)
+{
+	wclear(local_win);
+	wborder(local_win, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ');
+	wrefresh(local_win);
+	delwin(local_win);
 }
 
-WINDOW *create_newwin(int height, int width, int starty, int startx){
-  WINDOW *local_win;
+WINDOW *create_newwin(int height, int width, int starty, int startx)
+{
+	WINDOW *local_win;
 
-  local_win = newwin(height, width, starty, startx);
-  box(local_win, 0 , 0);
-  wrefresh(local_win);
+	local_win = newwin(height, width, starty, startx);
+	box(local_win, 0, 0);
+	wrefresh(local_win);
 
-  return local_win;
+	return local_win;
 }
 
-void rowMenu(list* l, int yMax, int xMax){
-	WINDOW * rowwin;
+void rowMenu(list *l, int yMax, int xMax)
+{
+	WINDOW *rowwin;
 
-	rowwin = create_newwin(8,40, (yMax/2)-4, (xMax/2)-20);
+	rowwin = create_newwin(8, 40, (yMax / 2) - 4, (xMax / 2) - 20);
 	refresh();
-	box(rowwin,0,0);
+	box(rowwin, 0, 0);
 	wrefresh(rowwin);
 
 	keypad(rowwin, true);
-	char rowChoices [4] [40] = {"Mostrar a Fila", "Adicionar","Chamar o Proximo", "Voltar"};
+	char rowChoices[4][40] = {"Mostrar a Fila", "Adicionar", "Chamar o Proximo", "Voltar"};
 	int rowChoice, highlight = 0, rowOption, aux = 0;
 
-
-	while(!aux) {	
-		for(int i = 0; i < 4; i++){
-			if(i == highlight)
-				wattron(rowwin,A_REVERSE);
-			mvwprintw(rowwin, i+2, 1,"\t%s", rowChoices[i]);
-			wattroff(rowwin,A_REVERSE);
+	while (!aux)
+	{
+		for (int i = 0; i < 4; i++)
+		{
+			if (i == highlight)
+				wattron(rowwin, A_REVERSE);
+			mvwprintw(rowwin, i + 2, 1, "\t%s", rowChoices[i]);
+			wattroff(rowwin, A_REVERSE);
 			wrefresh(rowwin);
 		}
 		rowChoice = wgetch(rowwin);
 
-		switch(rowChoice){
-			case KEY_UP:
-				highlight--;	
-				if(highlight == -1)
-					highlight = 3;
+		switch (rowChoice)
+		{
+		case KEY_UP:
+			highlight--;
+			if (highlight == -1)
+				highlight = 3;
+			break;
+		case KEY_DOWN:
+			highlight++;
+			if (highlight == 4)
+				highlight = 0;
+			break;
+		case 10:
+			rowOption = highlight + 1;
+			switch (rowOption)
+			{
+			case 1:
 				break;
-			case KEY_DOWN:
-				highlight++;
-				if(highlight == 4)
-					highlight = 0;
+			case 2:
 				break;
-			case 10:
-				rowOption = highlight+1;
-				switch(rowOption){
-					case 1:
-						break;
-					case 2:
-						break;
-					case 3: 
-						break;
-					case 4:
-						refresh();
-						destroy_win(rowwin);
-						aux = 1;
-						mainMenu(l);
-						break;
-					default:
-					refresh();
-					destroy_win(rowwin);
-					aux = 1;
-					mainMenu(l);
-
-				}
+			case 3:
+				break;
+			case 4:
+				refresh();
+				destroy_win(rowwin);
+				aux = 1;
+				mainMenu(l, yMax, xMax);
+				break;
 			default:
-				break;
+				refresh();
+				destroy_win(rowwin);
+				aux = 1;
+				mainMenu(l, yMax, xMax);
+			}
+		default:
+			break;
 		}
 	}
-	
 }
 
+void createClientsMenu(list *l, int yMax, int xMax)
+{
+	WINDOW *createclientwin;
 
-void createClientsMenu(list* l, int yMax, int xMax){
-	WINDOW * createclientwin;
-
-	createclientwin = create_newwin(8,40, (yMax/2)-4, (xMax/2)-20);
+	createclientwin = create_newwin(8, 40, (yMax / 2) - 4, (xMax / 2) - 20);
 	refresh();
-	box(createclientwin,0,0);
+	box(createclientwin, 0, 0);
 	wrefresh(createclientwin);
 
 	keypad(createclientwin, true);
-	char createClientsChoices [3] [22] = {"Nome: ", "CPF: ", "Saldo: "};
-	
-	for(int i = 0; i < 3; i++){
-		
-		mvwprintw(createclientwin, 1+i, 1,"%s", createClientsChoices[i]);
-		wattroff(createclientwin,A_REVERSE);
+	char createClientsChoices[3][22] = {"Nome: ", "CPF: ", "Saldo: "};
+
+	for (int i = 0; i < 3; i++)
+	{
+
+		mvwprintw(createclientwin, 1 + i, 1, "%s", createClientsChoices[i]);
+		wattroff(createclientwin, A_REVERSE);
 		wrefresh(createclientwin);
-	} 
+	}
 
 	echo();
-		wmove(createclientwin,1,6);
-			wgetnstr(createclientwin,c.name, 30);	
+	wmove(createclientwin, 1, 6);
+	wgetnstr(createclientwin, c.name, 30);
 
-		wmove(createclientwin,2,5);
-     wgetnstr(createclientwin, c.cpf, 11);
+	wmove(createclientwin, 2, 5);
+	wgetnstr(createclientwin, c.cpf, 11);
 
-		mvwscanw(createclientwin,3, 7, "%f", &c.balance);
+	mvwscanw(createclientwin, 3, 7, "%f", &c.balance);
 
-	getchar();	
-		refresh();
+	getchar();
+	refresh();
 
-		c.id = l->size + 1;
-		write_client_r(filename, &c, l);
+	c.id = l->size + 1;
+	write_client_r(filename, &c, l);
 
-		destroy_win(createclientwin);
-		clientsMenu(l, yMax, xMax);
-
+	destroy_win(createclientwin);
+	clientsMenu(l, yMax, xMax);
 }
 
-void viewClientsMenu(list* l, int yMax, int xMax){
-	WINDOW * viewclientwin;
-	
+void viewClientsMenu(list *l, int yMax, int xMax)
+{
+	WINDOW *viewclientwin;
+
 	getmaxyx(stdscr, yMax, xMax);
-	viewclientwin = create_newwin(8,40, (yMax/2)-4, (xMax/2)-20);
+	viewclientwin = create_newwin(8, 40, (yMax / 2) - 4, (xMax / 2) - 20);
 	refresh();
-	box(viewclientwin,0,0);
+	box(viewclientwin, 0, 0);
 	wrefresh(viewclientwin);
 
 	keypad(viewclientwin, true);
-	mvwprintw(viewclientwin,1, 1, " Nome\t\tCPF\t\tSaldo");
-	wattroff(viewclientwin,A_REVERSE);
+	mvwprintw(viewclientwin, 1, 1, " Nome\t\tCPF\t\tSaldo");
+	wattroff(viewclientwin, A_REVERSE);
 	wrefresh(viewclientwin);
 	refresh();
-	int starty = 1;   
-     	int startx = 1;
+	int starty = 1;
+	int startx = 1;
 
-	if(l->size > 0) {       
-		for(int i = 0; i < l->size; i++)
+	if (l->size > 0)
+	{
+		for (int i = 0; i < l->size; i++)
 		{
 			struct node *n = get(*l, i);
-			if(n != NULL)
+			if (n != NULL)
 			{
 				client cl = n->c;
 				wattroff(viewclientwin, A_REVERSE);
-				wmove(viewclientwin, starty+(i+1), startx);
-					wprintw(viewclientwin,"%s\t%s\t%.2f",cl.name,
-				cl.cpf, cl.balance);
-				wattroff(viewclientwin,A_REVERSE);
-					wrefresh(viewclientwin);
+				wmove(viewclientwin, starty + (i + 1), startx);
+				wprintw(viewclientwin, "%s\t%s\t%.2f", cl.name,
+						cl.cpf, cl.balance);
+				wattroff(viewclientwin, A_REVERSE);
+				wrefresh(viewclientwin);
 			}
 			n = n->next;
 		}
 	}
-	else{
-		mvwprintw(viewclientwin, 1,1,"nao tem cliente");
+	else
+	{
+		mvwprintw(viewclientwin, 1, 1, "nao tem cliente");
 	}
 	getch();
 	destroy_win(viewclientwin);
 	clientsMenu(l, yMax, xMax);
 }
 
-void clientsMenu(list* l, int yMax, int xMax){
-	WINDOW * clientwin;
+void clientsMenu(list *l, int yMax, int xMax)
+{
+	WINDOW *clientwin;
 
-	clientwin = create_newwin(8,40, (yMax/2)-4, (xMax/2)-20);
+	clientwin = create_newwin(8, 40, (yMax / 2) - 4, (xMax / 2) - 20);
 	refresh();
-	box(clientwin,0,0);
+	box(clientwin, 0, 0);
 	wrefresh(clientwin);
 
 	keypad(clientwin, true);
-	char clientsChoices [3] [22] = {"Criar um Cliente", "Listar Clientes", "Voltar"};
+	char clientsChoices[3][22] = {"Criar um Cliente", "Listar Clientes", "Voltar"};
 	int clientChoice, highlight = 0, clientOption, aux = 0;
-
-	while(!aux) {
-		for(int i = 0; i < 3; i++){
-			if(i == highlight)
-				wattron(clientwin,A_REVERSE);
-			mvwprintw(clientwin, i+2, 1,"\t%s", clientsChoices[i]);
-			wattroff(clientwin,A_REVERSE);
+	
+	while (!aux)
+	{
+		for (int i = 0; i < 3; i++)
+		{
+			if (i == highlight)
+				wattron(clientwin, A_REVERSE);
+			mvwprintw(clientwin, i + 2, 1, "\t%s", clientsChoices[i]);
+			wattroff(clientwin, A_REVERSE);
 			wrefresh(clientwin);
 		}
 		clientChoice = wgetch(clientwin);
 
-		switch(clientChoice){
-			case KEY_UP:
-				highlight--;
-				if(highlight == -1)
-					highlight = 2;
+		switch (clientChoice)
+		{
+		case KEY_UP:
+			highlight--;
+			if (highlight == -1)
+				highlight = 2;
+			break;
+		case KEY_DOWN:
+			highlight++;
+			if (highlight == 3)
+				highlight = 0;
+			break;
+		case 10:
+			clientOption = highlight + 1;
+			switch (clientOption)
+			{
+			case 1:
+				refresh();
+				destroy_win(clientwin);
+				createClientsMenu(l, yMax, xMax);
 				break;
-			case KEY_DOWN:
-				highlight++;
-				if(highlight == 3)
-					highlight = 0;
+			case 2:
+				refresh();
+				destroy_win(clientwin);
+				viewClientsMenu(l, yMax, xMax);
 				break;
-			case 10:
-				clientOption = highlight+1;
-				switch(clientOption){
-					case 1:
-						refresh();
-						destroy_win(clientwin);
-						createClientsMenu(l, yMax, xMax);
-						break;
-					case 2:
-						refresh();
-						destroy_win(clientwin);
-						viewClientsMenu(l, yMax, xMax);
-						break;
-					case 3:
-						refresh();
-						destroy_win(clientwin);
-						mainMenu(l);
-						aux = 1;
-						break;
-					default:
-						refresh();
-						break;
-				}
+			case 3:
+				refresh();
+				destroy_win(clientwin);
+				mainMenu(l, yMax, xMax);
+				aux = 1;
+				break;
 			default:
-
+				aux = 1;
+				refresh();
 				break;
+			}
+		default:	
+			break;
 		}
 	}
-
 }
 
-void mainMenu(list* l){
-	int aux = 0;
-	int yMax, xMax;
-	getmaxyx(stdscr, yMax, xMax);
+void mainMenu(list *l, int yMax, int xMax)
+{
+	WINDOW *win;
 
-	WINDOW * win;
- 
-	win = create_newwin(8, 40, (yMax / 2) - 4,(xMax / 2) - 20);
+	win = create_newwin(8, 40, (yMax / 2) - 4, (xMax / 2) - 20);
 	refresh();
-	box(win,0, 0);
+	box(win, 0, 0);
 	wrefresh(win);
 
 	keypad(win, true);
 
 	char choices[3][9] = {"Clientes", "Fila", "Sair"};
-	int choice, highlight = 0, option;
-
-	while(!aux) {
-		for (int i = 0; i < 3; i++){
+	int choice, highlight = 0, option, aux = 0;
+	wrefresh(win);
+	while (!aux)
+	{
+		for (int i = 0; i < 3; i++)
+		{	
 			if (i == highlight)
 				wattron(win, A_REVERSE);
-			mvwprintw(win, i+2, 1,"\t%s", choices[i]);
-			wattroff(win,A_REVERSE);
+			
+			mvwprintw(win, i + 2, 1, "\t%s", choices[i]);
+			wattroff(win, A_REVERSE);
 			wrefresh(win);
 		}
 		choice = wgetch(win);
-
-		switch(choice) {
-			case KEY_UP:
-				highlight--;
-				if (highlight == -1)
-					highlight = 2;
+		switch (choice)
+		{
+		case KEY_UP:
+			highlight--;
+			if (highlight == -1)
+				highlight = 2;
+			break;
+		case KEY_DOWN:
+			highlight++;
+			if (highlight == 3)
+				highlight = 0;
+			break;
+		case 10:
+			option = highlight + 1;
+			switch (option)
+			{
+			case 1:
+				refresh();
+				destroy_win(win);
+				clientsMenu(l, yMax, xMax);
 				break;
-			case KEY_DOWN:
-				highlight++;
-				if(highlight == 3)
-					highlight = 0;
+			case 2:
+				refresh();
+				destroy_win(win);
+				rowMenu(l, yMax, xMax);
 				break;
-			case 10:
-				option = highlight + 1;
-				switch(option){
-					case 1:
-						refresh();
-						destroy_win(win);
-						clientsMenu(l, yMax, xMax);
-						break;
-					case 2:
-						refresh();
-						destroy_win(win);
-						rowMenu(l, yMax, xMax);
-						break;
-					case 3:
-						refresh();
-						aux = 1;
-						destroy_win(win);
-						endwin();
-						break;
-					default:
-						refresh();
-						aux = 1;
-						break;
-
-				}
+			case 3:
+				refresh();
+				destroy_win(win);
+				aux =1;
+				endwin();
+				exit(0);
+				break;
 			default:
+				refresh();
+				aux = 1;
 				break;
+			}
 		}
-
 	}
-	
+	aux =1;
+	refresh();
+	endwin();	
+	return;
 }
 
-void printMenu(list* l){
+void printMenu(list *l)
+{
 	initscr();
 	noecho();
 	cbreak();
-	mainMenu(l);
+	int yMax, xMax;
+	getmaxyx(stdscr, yMax, xMax);
+	mainMenu(l, yMax, xMax);
+	refresh();
+	endwin();
 }

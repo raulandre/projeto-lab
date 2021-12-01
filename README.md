@@ -21,4 +21,4 @@ Implementação de um Banco em C com a biblioteca gráfica Ncurses.
 
 ## Documentação
 
-- `git clone https://github.com/raulandre/projeto-lab && cd projeto-lab/ && cd bin/ && clear && ./a.out`
+- `git clone https://github.com/raulandre/projeto-lab && cd projeto-lab/ && make && cd bin/ && clear && ./a.out`

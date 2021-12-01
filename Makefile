@@ -2,7 +2,7 @@ CC = clang
 FLAGS = -Werror -Wall -O2 -I./include
 
 all: bin main.o client.o list.o queue.o mainmenu.o serial.o
-	$(CC) $(FLAGS) obj/main.o obj/client.o obj/list.o obj/queue.o obj/mainmenu.o obj/serial.o -lncurses -o bin/a.out && cd bin/ && clear && ./a.out
+	$(CC) $(FLAGS) obj/main.o obj/client.o obj/list.o obj/queue.o obj/mainmenu.o obj/serial.o -lncurses -o bin/a.out && cd bin/ && clear && ./a.out && cd ..
 
 main.o: src/main.c
 	$(CC) $(FLAGS) -c src/main.c -o obj/main.o

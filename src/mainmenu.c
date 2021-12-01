@@ -27,10 +27,65 @@ WINDOW *create_newwin(int height, int width, int starty, int startx)
 	return local_win;
 }
 
-void rowMenu(list *l, int yMax, int xMax)
+void rowViewMenu (list *l, fila *f, int yMax, int xMax)
+{	
+	WINDOW *viewclientwin;
+
+	getmaxyx(stdscr, yMax, xMax);
+	viewclientwin = create_newwin(8, 40, (yMax / 2) - 4, (xMax / 2) - 20);
+	refresh();
+	box(viewclientwin, 0, 0);
+	wrefresh(viewclientwin);
+
+	keypad(viewclientwin, true);
+	mvwprintw(viewclientwin, 1, 1, " Nome\t\tCPF\t\tSaldo");
+	wattroff(viewclientwin, A_REVERSE);
+	wrefresh(viewclientwin);
+	refresh();
+	int starty = 1;
+	int startx = 1;
+
+
+	struct no *n = f->inicio;
+	/*if (n != NULL)
+	  {
+	  client cl = n->c;
+	  wattroff(viewclientwin, A_REVERSE);
+	  wmove(viewclientwin, starty + (i + 1), startx);
+	  wprintw(viewclientwin, "%s\t%s\t%.2f", cl.name,
+	  cl.cpf, cl.balance);
+	  wattroff(viewclientwin, A_REVERSE);
+	  wrefresh(viewclientwin)
+	  }
+	  n = n->next;*/
+	if (n != NULL)
+	{
+		int i = 0;
+
+		do
+		{
+			client cl = n->c;
+
+			wattroff(viewclientwin, A_REVERSE);
+			wmove(viewclientwin, starty + (i + 1), startx);
+			wprintw(viewclientwin, "%s\t%s\t%.2f", cl.name,
+					cl.cpf, cl.balance);
+			wattroff(viewclientwin, A_REVERSE);
+			wrefresh(viewclientwin);
+				n = n-> prox;
+				i++;
+
+		} while (n != NULL);
+	}
+
+	getch();
+	destroy_win(viewclientwin);
+	clientsMenu(l, f, yMax, xMax);
+}
+void rowMenu(list *l, fila *f, int yMax, int xMax)
 {
 	WINDOW *rowwin;
-
+	
 	rowwin = create_newwin(8, 40, (yMax / 2) - 4, (xMax / 2) - 20);
 	refresh();
 	box(rowwin, 0, 0);
@@ -68,7 +123,10 @@ void rowMenu(list *l, int yMax, int xMax)
 			rowOption = highlight + 1;
 			switch (rowOption)
 			{
-			case 1:
+			case 1: 
+				refresh();
+				destroy_win (rowwin);
+				rowViewMenu(l, f, yMax, xMax);
 				break;
 			case 2:
 				break;
@@ -78,13 +136,13 @@ void rowMenu(list *l, int yMax, int xMax)
 				refresh();
 				destroy_win(rowwin);
 				aux = 1;
-				mainMenu(l, yMax, xMax);
+				mainMenu(l, f, yMax, xMax);
 				break;
 			default:
 				refresh();
 				destroy_win(rowwin);
 				aux = 1;
-				mainMenu(l, yMax, xMax);
+				mainMenu(l, f, yMax, xMax);
 			}
 		default:
 			break;
@@ -92,7 +150,7 @@ void rowMenu(list *l, int yMax, int xMax)
 	}
 }
 
-void createClientsMenu(list *l, int yMax, int xMax)
+void createClientsMenu (list *l, fila *f, int yMax, int xMax)
 {
 	WINDOW *createclientwin;
 
@@ -128,10 +186,10 @@ void createClientsMenu(list *l, int yMax, int xMax)
 	write_client_r(filename, &c, l);
 
 	destroy_win(createclientwin);
-	clientsMenu(l, yMax, xMax);
+	clientsMenu(l, f, yMax, xMax);
 }
 
-void viewClientsMenu(list *l, int yMax, int xMax)
+void viewClientsMenu(list *l, fila *f, int yMax, int xMax)
 {
 	WINDOW *viewclientwin;
 
@@ -173,10 +231,10 @@ void viewClientsMenu(list *l, int yMax, int xMax)
 	}
 	getch();
 	destroy_win(viewclientwin);
-	clientsMenu(l, yMax, xMax);
+	clientsMenu(l, f, yMax, xMax);
 }
 
-void clientsMenu(list *l, int yMax, int xMax)
+void clientsMenu(list *l, fila *f, int yMax, int xMax)
 {
 	WINDOW *clientwin;
 
@@ -220,17 +278,17 @@ void clientsMenu(list *l, int yMax, int xMax)
 			case 1:
 				refresh();
 				destroy_win(clientwin);
-				createClientsMenu(l, yMax, xMax);
+				createClientsMenu(l, f, yMax, xMax);
 				break;
 			case 2:
 				refresh();
 				destroy_win(clientwin);
-				viewClientsMenu(l, yMax, xMax);
+				viewClientsMenu(l, f, yMax, xMax);
 				break;
 			case 3:
 				refresh();
 				destroy_win(clientwin);
-				mainMenu(l, yMax, xMax);
+				mainMenu(l, f, yMax, xMax);
 				aux = 1;
 				break;
 			default:
@@ -244,7 +302,7 @@ void clientsMenu(list *l, int yMax, int xMax)
 	}
 }
 
-void mainMenu(list *l, int yMax, int xMax)
+void mainMenu(list *l, fila *f, int yMax, int xMax)
 {
 	WINDOW *win;
 
@@ -289,12 +347,12 @@ void mainMenu(list *l, int yMax, int xMax)
 			case 1:
 				refresh();
 				destroy_win(win);
-				clientsMenu(l, yMax, xMax);
+				clientsMenu(l, f, yMax, xMax);
 				break;
 			case 2:
 				refresh();
 				destroy_win(win);
-				rowMenu(l, yMax, xMax);
+				rowMenu(l, f, yMax, xMax);
 				break;
 			case 3:
 				refresh();
@@ -316,14 +374,14 @@ void mainMenu(list *l, int yMax, int xMax)
 	return;
 }
 
-void printMenu(list *l)
+void printMenu(list *l, fila *f)
 {
 	initscr();
 	noecho();
 	cbreak();
 	int yMax, xMax;
 	getmaxyx(stdscr, yMax, xMax);
-	mainMenu(l, yMax, xMax);
+	mainMenu(l, f, yMax, xMax);
 	refresh();
 	endwin();
 }

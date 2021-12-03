@@ -27,7 +27,7 @@ int  insere(fila *q, client d)
     return 1;
 }
 
-int  retira(fila *q, client *d)
+int  retira(fila *q)
 {
     struct no *aux;
     if (q->inicio == NULL)
@@ -35,7 +35,6 @@ int  retira(fila *q, client *d)
 
     aux = q->inicio;
 
-    *d = q->inicio->c;
 
     q->inicio = q->inicio->prox;
     free(aux);

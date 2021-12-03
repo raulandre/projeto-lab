@@ -7,8 +7,6 @@
 #define filename "clients.dat"
 
 client c;
-int senha = 0;
-int senhaprox = 0;
 
 void destroy_win(WINDOW *local_win)
 {
@@ -40,24 +38,25 @@ void rowViewMenu(list *l, fila *f, int yMax, int xMax)
 	wrefresh(viewclientwin);
 
 	keypad(viewclientwin, true);
-	mvwprintw(viewclientwin, 1, 1, " Senha: %d", senha);
+	mvwprintw(viewclientwin, 1, 1, " Senha: %d");
 	wattroff(viewclientwin, A_REVERSE);
 	wrefresh(viewclientwin);
 	refresh();
-	//int starty = 1;
-	//int startx = 1;
+        int starty = 1;
+        int startx = 1;
 
-	//struct no *n = f->inicio;
+        struct no *n = f->inicio;
 	/*if (n != NULL)
 	  {
 	  client cl = n->c;
 	  wattroff(viewclientwin, A_REVERSE);
-	  wmove(viewclientwin, starty + (i + 1), startx);
+	  wmove(viewclientwin, starty+ 1, startx);
 	  wprintw(viewclientwin, "%s\t%s\t%.2f", cl.name, cl.id);
 	  wattroff(viewclientwin, A_REVERSE);
-	  wrefresh(viewclientwin)
+	  wrefresh(viewclientwin);
 	  }
-	  n = n->next;
+	  n = n->next; */
+	//AQUI
 	if (n != NULL)
 	{
 		int i = 0;
@@ -67,7 +66,7 @@ void rowViewMenu(list *l, fila *f, int yMax, int xMax)
 			client cl = n->c;
 
 			wattroff(viewclientwin, A_REVERSE);
-			wmove(viewclientwin, starty + (i + 1), startx);
+			wmove(viewclientwin, starty + 1, startx);
 			wprintw(viewclientwin, "%s\t%s\t%.2f", cl.name,
 					cl.cpf, cl.balance);
 			wattroff(viewclientwin, A_REVERSE);
@@ -77,7 +76,7 @@ void rowViewMenu(list *l, fila *f, int yMax, int xMax)
 
 		} while (n != NULL);
 	}
-	*/
+	//fim do aqui
 	getch();
 	destroy_win(viewclientwin);
 	rowMenu(l, f, yMax, xMax);
@@ -94,19 +93,36 @@ void creteRowMenu(list *l, fila *f, int yMax, int xMax)
 	wrefresh(createrowwin);
 
 	keypad(createrowwin, true);
-	int exit = 1;
+	//int codigo = cl.id * 1420;
+	//c.id = l->size + 1;
+	int id = 0;
+	mvwprintw(createrowwin, 1, 1, "Para adicionar um cliente a fila digite o seu Codigo");
+	wattroff(createrowwin, A_REVERSE);
+	wrefresh(createrowwin);
+	refresh();
 
-	while (exit != 113)
+	echo();
+	mvwscanw(createrowwin, 3, 1, "%d", &id);
+	for (int i = 0; i < l->size; i++)
 	{
-		mvwprintw(createrowwin, 1, 1, "Sua Senha é: %d", senha);
-		wmove(createrowwin, 1, 14);
-		wattroff(createrowwin, A_REVERSE);
-		senha++;
-		exit = wgetch(createrowwin);
-		mvwprintw(createrowwin, 2, 1, "%s", "Para sair aperte q");
-		refresh();
+		struct node *n = get(*l, i);
+		if (n != NULL)
+		{
+			mvwprintw(createrowwin, 4, 1, "roii");
+			client cl = n->c;
+			if (cl.id == id)
+			{
+				insere(f, cl);
+				mvwprintw(createrowwin, 4, 1, "%d\t%s\t%s\t%.2f", id, cl.name,
+						  cl.cpf, cl.balance);
+			}
+                }
+		n = n->next;
 	}
 
+	mvwprintw(createrowwin, 4, 1, "nao tem cliente com  esse codigo");
+
+	getch();
 	destroy_win(createrowwin);
 	rowMenu(l, f, yMax, xMax);
 }
@@ -122,11 +138,20 @@ void nextRowMenu(list *l, fila *f, int yMax, int xMax)
 	wrefresh(nextrowwin);
 
 	keypad(nextrowwin, true);
-	mvwprintw(nextrowwin, 1, 1, "senha atual %d, chamando  o proximo....", senha);
+	mvwprintw(nextrowwin, 1, 1, "Chamar proximo Cliente da Fila");
 	wattroff(nextrowwin, A_REVERSE);
 	wrefresh(nextrowwin);
 	refresh();
-	senhaprox++;
+        if(f->inicio !=NULL){
+                client cl = f->inicio->c;
+                mvwprintw(nextrowwin,2, 1,"%s", cl.name);
+        }
+        else{
+                wprintw(nextrowwin, "Fila Vazia");
+        }
+
+        wrefresh(nextrowwin);
+        retira(f);
 	getch();
 	destroy_win(nextrowwin);
 	rowMenu(l, f, yMax, xMax);
@@ -142,7 +167,7 @@ void rowMenu(list *l, fila *f, int yMax, int xMax)
 	wrefresh(rowwin);
 
 	keypad(rowwin, true);
-	char rowChoices[4][40] = {"Entrar na Fila", "Mostrar a Fila", "Chamar o Proximo", "Voltar"};
+	char rowChoices[4][40] = {"Chamar o Proximo", "Adicionar Cliente na Fila", "Mostrar a Fila", "Voltar"};
 	int rowChoice, highlight = 0, rowOption, aux = 0;
 
 	while (!aux)
@@ -176,18 +201,18 @@ void rowMenu(list *l, fila *f, int yMax, int xMax)
 			case 1:
 				refresh();
 				destroy_win(rowwin);
-				creteRowMenu(l, f, yMax, xMax);
-				
+				nextRowMenu(l, f, yMax, xMax);
+
 				break;
 			case 2:
 				refresh();
 				destroy_win(rowwin);
-				rowViewMenu(l, f, yMax, xMax);
+				creteRowMenu(l, f, yMax, xMax);
 				break;
 			case 3:
 				refresh();
 				destroy_win(rowwin);
-				nextRowMenu(l, f, yMax, xMax);
+				rowViewMenu(l, f, yMax, xMax);
 				break;
 			case 4:
 				refresh();
@@ -219,34 +244,29 @@ void createClientsMenu(list *l, fila *f, int yMax, int xMax)
 	keypad(createclientwin, true);
 	char createClientsChoices[3][22] = {"Nome: ", "CPF: ", "Saldo: "};
 
-	while (senhaprox <= senha)
+	for (int i = 0; i < 3; i++)
 	{
 
-		mvwprintw(createclientwin, 1, 1, "Senha chamada: %d", senhaprox);
-		for (int i = 0; i < 3; i++)
-		{
-
-			mvwprintw(createclientwin, 2 + i, 1, "%s", createClientsChoices[i]);
-			wattroff(createclientwin, A_REVERSE);
-			wrefresh(createclientwin);
-		}
-
-		echo();
-		wmove(createclientwin, 2, 6);
-		wgetnstr(createclientwin, c.name, 30);
-
-		wmove(createclientwin, 3, 5);
-		wgetnstr(createclientwin, c.cpf, 11);
-
-		mvwscanw(createclientwin, 4, 7, "%f", &c.balance);
-
-		getchar();
-		refresh();
-
-		c.id = l->size + 1;
-		write_client_r(filename, &c, l);
-		senhaprox++;
+		mvwprintw(createclientwin, 2 + i, 1, "%s", createClientsChoices[i]);
+		wattroff(createclientwin, A_REVERSE);
+		wrefresh(createclientwin);
 	}
+
+	echo();
+	wmove(createclientwin, 2, 6);
+	wgetnstr(createclientwin, c.name, 30);
+
+	wmove(createclientwin, 3, 5);
+	wgetnstr(createclientwin, c.cpf, 11);
+
+	mvwscanw(createclientwin, 4, 7, "%f", &c.balance);
+
+	getchar();
+	refresh();
+
+	c.id = l->size + 1;
+	write_client_r(filename, &c, l);
+
 	destroy_win(createclientwin);
 	clientsMenu(l, f, yMax, xMax);
 }
@@ -262,7 +282,7 @@ void viewClientsMenu(list *l, fila *f, int yMax, int xMax)
 	wrefresh(viewclientwin);
 
 	keypad(viewclientwin, true);
-	mvwprintw(viewclientwin, 1, 1, " Nome\t\tCPF\t\tSaldo");
+	mvwprintw(viewclientwin, 1, 1, "Codigo\tNome\tCPF\t\tSaldo");
 	wattroff(viewclientwin, A_REVERSE);
 	wrefresh(viewclientwin);
 	refresh();
@@ -279,7 +299,7 @@ void viewClientsMenu(list *l, fila *f, int yMax, int xMax)
 				client cl = n->c;
 				wattroff(viewclientwin, A_REVERSE);
 				wmove(viewclientwin, starty + (i + 1), startx);
-				wprintw(viewclientwin, "%s\t%s\t%.2f", cl.name,
+				wprintw(viewclientwin, "%4d\t%s\t%s\t%.2f", cl.id, cl.name,
 						cl.cpf, cl.balance);
 				wattroff(viewclientwin, A_REVERSE);
 				wrefresh(viewclientwin);
@@ -375,7 +395,7 @@ void mainMenu(list *l, fila *f, int yMax, int xMax)
 
 	keypad(win, true);
 
-	char choices[3][9] = {"Fila", "Clientes", "Sair"};
+	char choices[3][9] = {"Clientes", "Fila", "Sair"};
 	int choice, highlight = 0, option, aux = 0;
 	wrefresh(win);
 	while (!aux)
@@ -409,12 +429,12 @@ void mainMenu(list *l, fila *f, int yMax, int xMax)
 			case 1:
 				refresh();
 				destroy_win(win);
-				rowMenu(l, f, yMax, xMax);
+				clientsMenu(l, f, yMax, xMax);
 				break;
 			case 2:
 				refresh();
 				destroy_win(win);
-				clientsMenu(l, f, yMax, xMax);
+				rowMenu(l, f, yMax, xMax);
 				break;
 			case 3:
 				refresh();

@@ -19,7 +19,7 @@ typedef struct
 } fila;
 
 int  insere(fila *q, client);
-int  retira(fila *q, client *);
+int  retira(fila *q);
 void mostra(fila q);
 
 #endif // QUEUE_H

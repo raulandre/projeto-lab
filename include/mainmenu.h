@@ -16,5 +16,5 @@ void rowMenu(list*, fila*, int, int);
 void clientsMenu(list*, fila*, int, int);
 void mainMenu(list*, fila*, int, int);
 void printMenu(list*, fila*);
-void rowViewMenu (list*, fila*, int, int);
+void rowViewMenu (list*, fila*, int, int, int);
 #endif 

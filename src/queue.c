@@ -49,3 +49,16 @@ void cria(fila *q)
 	q->inicio = NULL;
 	q->fim = NULL;
 }
+
+struct no *getq(fila *q, size_t index)
+{
+	struct no *b = q->inicio;
+    	for(int i = 0; i < index; i++)
+	{
+		if(b == NULL) return NULL;
+	        b = b->prox;
+	}
+
+	return b;
+
+}

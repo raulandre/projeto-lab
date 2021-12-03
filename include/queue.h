@@ -21,5 +21,6 @@ typedef struct
 int  insere(fila *q, client);
 int  retira(fila *q);
 void cria(fila *q);
+struct no *getq(fila *q, size_t index);
 
 #endif // QUEUE_H

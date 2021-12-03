@@ -28,7 +28,7 @@ WINDOW *create_newwin(int height, int width, int starty, int startx)
 	return local_win;
 }
 
-void rowViewMenu(list *l, fila *f, int yMax, int xMax)
+void rowViewMenu(list *l, fila *f, int yMax, int xMax, int skip)
 {
 	WINDOW *viewclientwin;
 
@@ -39,32 +39,55 @@ void rowViewMenu(list *l, fila *f, int yMax, int xMax)
 	wrefresh(viewclientwin);
 
 	keypad(viewclientwin, true);
-	mvwprintw(viewclientwin, 1, 1, " Senha: %d");
 	wattroff(viewclientwin, A_REVERSE);
 	wrefresh(viewclientwin);
 	refresh();
         int starty = 1;
         int startx = 1;
 
-        struct no *n = f->inicio;
+    struct no *n = f->inicio;
 	if (n != NULL)
 	{
-		int i = 0;
-		do
+		for (int i = 0; i < 5; i++)
 		{
-			client cl = n->c;
-
-			wattroff(viewclientwin, A_REVERSE);
-			wmove(viewclientwin, starty + i, startx);
-			wprintw(viewclientwin, "%s\t%s\t%.2f", cl.name,
+			struct no *n = getq(f, i + skip);
+			if (n != NULL)
+			{
+				client cl = n->c;
+				wattroff(viewclientwin, A_REVERSE);
+				wmove(viewclientwin, starty + (i + 1), startx);
+				wprintw(viewclientwin, "%s\t%s\t%.2f", cl.name,
 					cl.cpf, cl.balance);
-			wattroff(viewclientwin, A_REVERSE);
-			wrefresh(viewclientwin);
-			n = n->prox;
-			i++;
-		} while (n != NULL);
+				wattroff(viewclientwin, A_REVERSE);
+				wrefresh(viewclientwin);
+				n = n->prox;
+			}
+		}
 	}
-	getch();
+
+	int r, quit = 0;
+	while(!quit)
+	{
+		r = wgetch(viewclientwin);
+		switch(r)
+		{
+			case KEY_UP:
+				gSkip = gSkip > 0 ? gSkip - 5 : 0;
+				rowViewMenu(l, f, yMax, xMax, gSkip);
+				break;
+			case KEY_DOWN:
+				gSkip = gSkip + 5;
+				rowViewMenu(l, f, yMax, xMax, gSkip);
+				break;
+			case 10:			
+				quit = 1;		
+				destroy_win(viewclientwin);
+				rowMenu(l, f, yMax, xMax);
+				break;
+		}
+	}
+	gSkip = 0;
+
 	destroy_win(viewclientwin);
 	rowMenu(l, f, yMax, xMax);
 }
@@ -105,7 +128,7 @@ void creteRowMenu(list *l, fila *f, int yMax, int xMax)
 		n = n->next;
 	}
 
-	mvwprintw(createrowwin, 4, 1, "nao tem cliente com  esse codigo");
+	mvwprintw(createrowwin, 4, 1, "Cliente nao encontrado");
 
 	getch();
 	destroy_win(createrowwin);
@@ -197,7 +220,7 @@ void rowMenu(list *l, fila *f, int yMax, int xMax)
 			case 3:
 				refresh();
 				destroy_win(rowwin);
-				rowViewMenu(l, f, yMax, xMax);
+				rowViewMenu(l, f, yMax, xMax, 0);
 				break;
 			case 4:
 				refresh();
@@ -313,12 +336,14 @@ void viewClientsMenu(list *l, fila *f, int yMax, int xMax, int skip)
 				gSkip = gSkip + 5;
 				viewClientsMenu(l, f, yMax, xMax, gSkip);
 				break;
-			case 10:					
+			case 10:			
+				quit = 1;		
 				destroy_win(viewclientwin);
 				clientsMenu(l, f, yMax, xMax);
 				break;
 		}
 	}
+	gSkip = 0;
 
 	destroy_win(viewclientwin);
 	clientsMenu(l, f, yMax, xMax);

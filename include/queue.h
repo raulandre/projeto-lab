@@ -20,6 +20,6 @@ typedef struct
 
 int  insere(fila *q, client);
 int  retira(fila *q);
-void mostra(fila q);
+void cria(fila *q);
 
 #endif // QUEUE_H

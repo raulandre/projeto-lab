@@ -44,18 +44,8 @@ int  retira(fila *q)
     return 1;
 }
 
-void mostra(fila q)
+void cria(fila *q)
 {
-    struct no *aux;
-    if (q.inicio == NULL)
-        printf("\nFila vazia...\n\n");
-    else
-    {
-        aux = q.inicio;
-        while (aux != NULL)
-        {
-            print_client(aux->c);
-            aux = aux->prox;
-        }
-    }
+	q->inicio = NULL;
+	q->fim = NULL;
 }

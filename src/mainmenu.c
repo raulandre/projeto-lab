@@ -7,6 +7,7 @@
 #define filename "clients.dat"
 
 client c;
+int gSkip = 0;
 
 void destroy_win(WINDOW *local_win)
 {
@@ -46,37 +47,23 @@ void rowViewMenu(list *l, fila *f, int yMax, int xMax)
         int startx = 1;
 
         struct no *n = f->inicio;
-	/*if (n != NULL)
-	  {
-	  client cl = n->c;
-	  wattroff(viewclientwin, A_REVERSE);
-	  wmove(viewclientwin, starty+ 1, startx);
-	  wprintw(viewclientwin, "%s\t%s\t%.2f", cl.name, cl.id);
-	  wattroff(viewclientwin, A_REVERSE);
-	  wrefresh(viewclientwin);
-	  }
-	  n = n->next; */
-	//AQUI
 	if (n != NULL)
 	{
 		int i = 0;
-
 		do
 		{
 			client cl = n->c;
 
 			wattroff(viewclientwin, A_REVERSE);
-			wmove(viewclientwin, starty + 1, startx);
+			wmove(viewclientwin, starty + i, startx);
 			wprintw(viewclientwin, "%s\t%s\t%.2f", cl.name,
 					cl.cpf, cl.balance);
 			wattroff(viewclientwin, A_REVERSE);
 			wrefresh(viewclientwin);
 			n = n->prox;
 			i++;
-
 		} while (n != NULL);
 	}
-	//fim do aqui
 	getch();
 	destroy_win(viewclientwin);
 	rowMenu(l, f, yMax, xMax);
@@ -93,8 +80,6 @@ void creteRowMenu(list *l, fila *f, int yMax, int xMax)
 	wrefresh(createrowwin);
 
 	keypad(createrowwin, true);
-	//int codigo = cl.id * 1420;
-	//c.id = l->size + 1;
 	int id = 0;
 	mvwprintw(createrowwin, 1, 1, "Para adicionar um cliente a fila digite o seu Codigo");
 	wattroff(createrowwin, A_REVERSE);
@@ -271,7 +256,7 @@ void createClientsMenu(list *l, fila *f, int yMax, int xMax)
 	clientsMenu(l, f, yMax, xMax);
 }
 
-void viewClientsMenu(list *l, fila *f, int yMax, int xMax)
+void viewClientsMenu(list *l, fila *f, int yMax, int xMax, int skip)
 {
 	WINDOW *viewclientwin;
 
@@ -282,36 +267,59 @@ void viewClientsMenu(list *l, fila *f, int yMax, int xMax)
 	wrefresh(viewclientwin);
 
 	keypad(viewclientwin, true);
-	mvwprintw(viewclientwin, 1, 1, "Codigo\tNome\tCPF\t\tSaldo");
+	mvwprintw(viewclientwin, 1, 1, "ID\tNome\tCPF\t\tSaldo");
 	wattroff(viewclientwin, A_REVERSE);
 	wrefresh(viewclientwin);
 	refresh();
 	int starty = 1;
 	int startx = 1;
 
+	int r;
+
 	if (l->size > 0)
 	{
-		for (int i = 0; i < l->size; i++)
+		for (int i = 0; i < 5; i++)
 		{
-			struct node *n = get(*l, i);
+			struct node *n = get(*l, i + skip);
 			if (n != NULL)
 			{
 				client cl = n->c;
 				wattroff(viewclientwin, A_REVERSE);
 				wmove(viewclientwin, starty + (i + 1), startx);
-				wprintw(viewclientwin, "%4d\t%s\t%s\t%.2f", cl.id, cl.name,
+				wprintw(viewclientwin, "%3d\t%s\t%s\t%.2f", cl.id, cl.name,
 						cl.cpf, cl.balance);
 				wattroff(viewclientwin, A_REVERSE);
 				wrefresh(viewclientwin);
+				n = n->next;
 			}
-			n = n->next;
 		}
 	}
 	else
 	{
-		mvwprintw(viewclientwin, 1, 1, "nao tem cliente");
+		mvwprintw(viewclientwin, 2, 1, "Nenhum cliente registrado");
 	}
-	getch();
+	
+	int quit = 0;
+	while(!quit)
+	{
+		r = wgetch(viewclientwin);
+		switch(r)
+		{
+			case KEY_UP:
+				gSkip = gSkip > 0 ? gSkip - 5 : 0;
+				viewClientsMenu(l, f, yMax, xMax, gSkip);
+				break;
+			case KEY_DOWN:
+				gSkip = gSkip + 5;
+				viewClientsMenu(l, f, yMax, xMax, gSkip);
+				break;
+			case 10:					
+				destroy_win(viewclientwin);
+				clientsMenu(l, f, yMax, xMax);
+				break;
+		}
+	}
+
 	destroy_win(viewclientwin);
 	clientsMenu(l, f, yMax, xMax);
 }
@@ -365,7 +373,7 @@ void clientsMenu(list *l, fila *f, int yMax, int xMax)
 			case 2:
 				refresh();
 				destroy_win(clientwin);
-				viewClientsMenu(l, f, yMax, xMax);
+				viewClientsMenu(l, f, yMax, xMax, 0);
 				break;
 			case 3:
 				refresh();

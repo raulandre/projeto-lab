@@ -19,6 +19,10 @@
 
 Implementação de um Banco em C com a biblioteca gráfica Ncurses.
 
+## Vídeo Demonstração
+
+- Link no youtube: https://www.youtube.com/watch?v=qz_WxSHMpSA
+
 ## Download
 
 - Binário para Windows: https://www.dropbox.com/s/iok48xl9orbtysm/windows.rar?dl=1

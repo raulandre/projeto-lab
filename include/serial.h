@@ -11,8 +11,8 @@ bool file_exists(const char*);
 int count_lines(const char*);
 int getmaxlen(const char*);
 void create_file(const char*);
-client parse_client(char*);
-void load_data(list*, const char*);
+client parse_client(char*); //Transforma uma string com CLIENT_FORMAT em client
+void load_data(list*, const char*); //Carrega o arquivo em uma lista
 void write_client(const char*, client*); //Apenas escreve o cliente
 void write_client_r(const char*, client*, list*); //Escreve o cliente e adiciona na lista
 

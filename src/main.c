@@ -1,7 +1,7 @@
 #include "mainmenu.h"
 #include "client.h"
 #include "list.h"
-#include "queue.h"
+#include "fila.h"
 #include "serial.h"
 
 #define filename "clients.dat"
@@ -9,7 +9,7 @@
 int main()
 {
 	list l; init(&l);
-	fila f; f.inicio = NULL; f.fim = NULL;
+	fila f; cria(&f);
 
 	if(!file_exists(filename))
 		create_file(filename);

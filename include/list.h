@@ -2,8 +2,8 @@
 #define LIST_H
 
 #ifndef __GNUC__
-#error This code requires specifically a C compiler.
-#endif // __GNUG__
+#error Temos 'delete' como identificador de funcao, por favor use um compilador C :P 
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -25,11 +25,11 @@ typedef struct
 } list;
 
 void init(list*);
-int push_back(list*, client);
-int push_front(list*, client);
-int insert(list*, unsigned int, client);
-void shift(list*);
-void pop(list*);
-void delete(list*, unsigned int);
-struct node* get(list, unsigned int);
+int push_back(list*, client); //Adiciona no final
+int push_front(list*, client); //Adiciona no inicio
+int insert(list*, unsigned int, client); //Insere em qualquer indice
+void shift(list*); //Remove o primeiro
+void pop(list*); //Remove o ultimo
+void delete(list*, unsigned int); //Remove de qualquer indice
+struct node* get(list, unsigned int); //Retorna o no em um determinado indice
 #endif // LIST_H

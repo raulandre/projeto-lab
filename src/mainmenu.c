@@ -45,7 +45,9 @@ void rowViewMenu(list *l, fila *f, int yMax, int xMax, int skip)
         int starty = 1;
         int startx = 1;
 
-    struct no *n = f->inicio;
+	mvwprintw(viewclientwin, 1, 1, "ID\tNome\tCPF\t\tSaldo");
+	
+	struct no *n = f->inicio;
 	if (n != NULL)
 	{
 		for (int i = 0; i < 5; i++)
@@ -56,13 +58,16 @@ void rowViewMenu(list *l, fila *f, int yMax, int xMax, int skip)
 				client cl = n->c;
 				wattroff(viewclientwin, A_REVERSE);
 				wmove(viewclientwin, starty + (i + 1), startx);
-				wprintw(viewclientwin, "%s\t%s\t%3.2f", cl.name,
-					cl.cpf, cl.balance);
+				wprintw(viewclientwin, "%d\t%s\t%s\t%3.2f", cl.id, cl.name, cl.cpf, cl.balance);
 				wattroff(viewclientwin, A_REVERSE);
 				wrefresh(viewclientwin);
 				n = n->prox;
 			}
 		}
+	}
+	else
+	{
+		mvwprintw(viewclientwin, 2, 1, "Ninguem na fila...");
 	}
 
 	int r, quit = 0;
@@ -73,20 +78,22 @@ void rowViewMenu(list *l, fila *f, int yMax, int xMax, int skip)
 		{
 			case KEY_UP:
 				gSkip = gSkip > 0 ? gSkip - 5 : 0;
+				destroy_win(viewclientwin);
 				rowViewMenu(l, f, yMax, xMax, gSkip);
 				break;
 			case KEY_DOWN:
 				gSkip = gSkip + 5;
+				destroy_win(viewclientwin);
 				rowViewMenu(l, f, yMax, xMax, gSkip);
 				break;
 			case 10:			
+				gSkip = 0;
 				quit = 1;		
 				destroy_win(viewclientwin);
 				rowMenu(l, f, yMax, xMax);
 				break;
 		}
 	}
-	gSkip = 0;
 
 	destroy_win(viewclientwin);
 	rowMenu(l, f, yMax, xMax);
@@ -104,7 +111,7 @@ void creteRowMenu(list *l, fila *f, int yMax, int xMax)
 
 	keypad(createrowwin, true);
 	int id = 0;
-	mvwprintw(createrowwin, 1, 1, "Para adicionar um cliente a fila digite o seu Codigo");
+	mvwprintw(createrowwin, 1, 1, "Informe o id do cliente:");
 	wattroff(createrowwin, A_REVERSE);
 	wrefresh(createrowwin);
 	refresh();
@@ -120,15 +127,17 @@ void creteRowMenu(list *l, fila *f, int yMax, int xMax)
 			if (cl.id == id)
 			{
 				insere(f, cl);
-				mvwprintw(createrowwin, 4, 1, "%d\t%s\t%s\t%3.2f", id, cl.name,
-						  cl.cpf, cl.balance);
+				mvwprintw(createrowwin, 4, 1, "%d\t%s\t%s\t%3.2f", id, cl.name, cl.cpf, cl.balance);
+				getch();
+				destroy_win(createrowwin);
+				rowMenu(l, f, yMax, xMax);
 			}
+			n = n->next;
                 }
-		n = n->next;
 	}
 
-	mvwprintw(createrowwin, 4, 1, "Cliente nao encontrado");
-
+	mvwprintw(createrowwin, 4, 1, "%s", "Cliente nao encontrado...");
+	wrefresh(createrowwin);
 	getch();
 	destroy_win(createrowwin);
 	rowMenu(l, f, yMax, xMax);
@@ -154,7 +163,7 @@ void nextRowMenu(list *l, fila *f, int yMax, int xMax)
                 mvwprintw(nextrowwin,2, 1,"%s", cl.name);
         }
         else{
-                wprintw(nextrowwin, "Fila Vazia");
+                mvwprintw(nextrowwin,2, 1, "%s", "Fila Vazia...");
         }
 
         wrefresh(nextrowwin);
@@ -329,20 +338,22 @@ void viewClientsMenu(list *l, fila *f, int yMax, int xMax, int skip)
 		{
 			case KEY_UP:
 				gSkip = gSkip > 0 ? gSkip - 5 : 0;
+				destroy_win(viewclientwin);
 				viewClientsMenu(l, f, yMax, xMax, gSkip);
 				break;
 			case KEY_DOWN:
 				gSkip = gSkip + 5;
+				destroy_win(viewclientwin);
 				viewClientsMenu(l, f, yMax, xMax, gSkip);
 				break;
 			case 10:			
+				gSkip = 0;
 				quit = 1;		
 				destroy_win(viewclientwin);
 				clientsMenu(l, f, yMax, xMax);
 				break;
 		}
 	}
-	gSkip = 0;
 
 	destroy_win(viewclientwin);
 	clientsMenu(l, f, yMax, xMax);

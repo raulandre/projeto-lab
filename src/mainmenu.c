@@ -56,7 +56,7 @@ void rowViewMenu(list *l, fila *f, int yMax, int xMax, int skip)
 				client cl = n->c;
 				wattroff(viewclientwin, A_REVERSE);
 				wmove(viewclientwin, starty + (i + 1), startx);
-				wprintw(viewclientwin, "%s\t%s\t%.2f", cl.name,
+				wprintw(viewclientwin, "%s\t%s\t%3.2f", cl.name,
 					cl.cpf, cl.balance);
 				wattroff(viewclientwin, A_REVERSE);
 				wrefresh(viewclientwin);
@@ -116,12 +116,11 @@ void creteRowMenu(list *l, fila *f, int yMax, int xMax)
 		struct node *n = get(*l, i);
 		if (n != NULL)
 		{
-			mvwprintw(createrowwin, 4, 1, "roii");
 			client cl = n->c;
 			if (cl.id == id)
 			{
 				insere(f, cl);
-				mvwprintw(createrowwin, 4, 1, "%d\t%s\t%s\t%.2f", id, cl.name,
+				mvwprintw(createrowwin, 4, 1, "%d\t%s\t%s\t%3.2f", id, cl.name,
 						  cl.cpf, cl.balance);
 			}
                 }
@@ -262,7 +261,7 @@ void createClientsMenu(list *l, fila *f, int yMax, int xMax)
 
 	echo();
 	wmove(createclientwin, 2, 6);
-	wgetnstr(createclientwin, c.name, 30);
+	wgetnstr(createclientwin, c.name, 12);
 
 	wmove(createclientwin, 3, 5);
 	wgetnstr(createclientwin, c.cpf, 11);
@@ -309,7 +308,7 @@ void viewClientsMenu(list *l, fila *f, int yMax, int xMax, int skip)
 				client cl = n->c;
 				wattroff(viewclientwin, A_REVERSE);
 				wmove(viewclientwin, starty + (i + 1), startx);
-				wprintw(viewclientwin, "%3d\t%s\t%s\t%.2f", cl.id, cl.name,
+				wprintw(viewclientwin, "%d  %s\t%s\t%3.2f", cl.id, cl.name,
 						cl.cpf, cl.balance);
 				wattroff(viewclientwin, A_REVERSE);
 				wrefresh(viewclientwin);

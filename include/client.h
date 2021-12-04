@@ -4,7 +4,7 @@
 typedef struct
 {
 	int id;
-	char name[31];
+	char name[13];
 	char cpf[12];
 	float balance;
 } client;
